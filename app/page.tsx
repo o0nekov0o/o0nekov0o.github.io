@@ -14,10 +14,8 @@ export default function Home() {
   // ✅ INIT THEME
   useEffect(() => {
     const saved = localStorage.getItem('theme')
-
     if (saved) setDark(saved === 'dark')
     else setDark(true)
-
     setMounted(true)
   }, [])
 
@@ -86,7 +84,7 @@ export default function Home() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-[#111827] dark:via-[#030712] dark:to-[#000000] text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#111827] dark:via-[#030712] dark:to-black text-gray-900 dark:text-gray-100">
 
       {/* NAVBAR */}
       <div className="flex justify-between items-center px-6 py-4 border-b bg-white dark:bg-black dark:border-gray-800">
@@ -99,20 +97,27 @@ export default function Home() {
 
       {/* HERO */}
       <section className="text-center py-24 px-6">
-        <motion.h1 className="text-5xl font-bold mb-6">
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-5xl font-bold mb-6"
+        >
           Développeur Python & Fullstack
         </motion.h1>
 
         <p className="max-w-xl mx-auto mb-8 text-gray-600 dark:text-gray-300">
-          Profil hybride combinant développement applicatif et expérience en environnement systèmes (exploitation, administration, supervision).
+          Profil hybride combinant développement applicatif et expérience en environnement systèmes et exploitation.
         </p>
 
         <a
           href="#projects"
-          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
         >
           Voir mes projets
         </a>
+
       </section>
 
       {/* SEPARATOR */}
@@ -123,24 +128,31 @@ export default function Home() {
         <h2 className="text-2xl text-center mb-12">Compétences</h2>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+
           {Object.entries(groupedSkills).map(([category, items]) => (
-            <div
+            <motion.div
               key={category}
-              className="p-6 border rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              viewport={{ once: true }}
+              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur transition hover:shadow-lg"
             >
               <h3 className="font-semibold mb-2">{category}</h3>
+
               <p className="text-sm">
                 {(items as string[]).join(', ')}
               </p>
-            </div>
+            </motion.div>
           ))}
+
         </div>
       </section>
 
       {/* SEPARATOR */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
-      {/* ABOUT ✅ AVANT PROJETS */}
+      {/* ABOUT */}
       <section className="py-20 px-6 max-w-4xl mx-auto text-center">
         <h2 className="text-2xl font-semibold mb-6">À propos</h2>
 
@@ -167,8 +179,12 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
           {sortedRepos.map((repo) => (
             <motion.div
               key={repo.id}
-              whileHover={{ y: -5 }}
-              className="p-6 border rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur shadow-sm hover:shadow-md transition"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+              viewport={{ once: true }}
+              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur shadow-sm hover:shadow-xl transition"
             >
               <h3 className="text-xl font-semibold mb-1">
                 {repo.name}
@@ -187,7 +203,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
                 target="_blank"
                 className="text-blue-500 hover:underline"
               >
-                Voir le code
+                Voir le code →
               </a>
 
             </motion.div>
@@ -198,7 +214,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
 
       {/* FOOTER */}
       <footer className="text-center text-sm text-gray-400 py-6">
-        © 2026 Kevin B • 91_kevb_1[at]protonmail.com
+        © 2026 Kevin B • 91_kevb_1 [at] protonmail.com
       </footer>
 
     </div>
