@@ -93,5 +93,5 @@ Script Python d’extraction de données avec génération de fichiers CSV et im
 
 ## 📬 Contact
 
-- 📧 Email : 91_kevb_1@protonmail.com
+- 📧 Email : 91_kevb_1[at]protonmail.com
 - GitHub : https://github.com/o0nekov0o
