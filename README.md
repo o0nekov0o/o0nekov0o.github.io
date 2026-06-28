@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌐 Portfolio — Kevin B
 
-## Getting Started
+Bienvenue sur mon portfolio développeur 👋
 
-First, run the development server:
+👉 https://monlogin.github.io
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💼 À propos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Développeur Python & Fullstack en reconversion, avec une forte expérience en environnement d’exploitation.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Je conçois des applications modernes avec une attention particulière à :
+- 🧠 l’expérience utilisateur
+- ⚙️ la qualité du code
+- 🔐 la sécurité des données
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Stack principale
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Frontend** : Next.js, TypeScript, Tailwind CSS  
+- **Backend** : Python, Django, Flask  
+- **API** : Django REST Framework  
+- **Base de données** : PostgreSQL, Supabase  
+- **DevOps** : Docker, GitHub Actions  
+- **Autres** : Algorithmes, scraping, automatisation  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧠 Projets principaux
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🧠 IDE Notes App (Projet phare)
+Application fullstack de prise de notes inspirée des IDE avec navigation contextuelle avancée, multi‑onglets et recherche temps réel.  
+👉 https://notepadsaas.vercel.app/
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+### 🚀 Task Manager SaaS
+Application SaaS fullstack de gestion de tâches avec authentification Supabase, base PostgreSQL et interface moderne en Next.js.  
+👉 https://taskmanagerapp-coral.vercel.app/
+
+---
+
+### 🔐 API sécurisée (Python + PostgreSQL)
+API backend sécurisée avec authentification par token, gestion des permissions et modélisation SQL.
+
+---
+
+### 📡 API REST Django
+API REST sécurisée développée avec Django REST Framework.
+
+---
+
+### ⚙️ Application Django (LITReview)
+Plateforme de critiques de livres avec gestion des utilisateurs et logique métier complète.
+
+---
+
+### 🧪 Projet DevOps Django
+Application Django avec tests automatisés, linting et CI/CD via Docker et GitHub Actions.
+
+---
+
+### 🧠 Algorithmes Python
+Implémentation d’algorithmes avec optimisation, analyse de performance et comparaison des résultats.
+
+---
+
+### 🌐 Frontend API Movies
+Interface JavaScript consommant une API Python avec affichage dynamique et navigation interactive.
+
+---
+
+### 🐍 Application Python MVC
+Logiciel Python structuré en architecture MVC avec gestion de données et rapports.
+
+---
+
+### 📊 Web Scraping
+Script Python d’extraction de données avec génération de fichiers CSV et images.
+
+---
+
+## 🔐 Fonctionnalités avancées du portfolio
+
+- 🌙 Dark mode par défaut
+- 📡 Projets dynamiques (GitHub API)
+- 🧠 Compétences dynamiques (Supabase)
+- 🔐 Interface admin sécurisée
+
+---
+
+## 📬 Contact
+
+- GitHub : https://github.com/monlogin
