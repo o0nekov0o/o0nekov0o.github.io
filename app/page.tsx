@@ -7,9 +7,12 @@ import { supabase } from '@/lib/supabaseClient'
 export default function Home() {
   const [dark, setDark] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const [skills, setSkills] = useState<any[]>([])
   const [repos, setRepos] = useState<any[]>([])
+
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
 
   // ✅ INIT THEME
   useEffect(() => {
@@ -25,6 +28,21 @@ export default function Home() {
     document.documentElement.classList.toggle('dark', dark)
     localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark, mounted])
+
+  // ✅ LOADING SCREEN
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // ✅ CURSOR TRACK
+  useEffect(() => {
+    const move = (e: MouseEvent) => {
+      setMouse({ x: e.clientX, y: e.clientY })
+    }
+    window.addEventListener('mousemove', move)
+    return () => window.removeEventListener('mousemove', move)
+  }, [])
 
   // ✅ FETCH SKILLS
   useEffect(() => {
@@ -43,20 +61,14 @@ export default function Home() {
           'https://api.github.com/users/o0nekov0o/repos',
           { headers: { Accept: 'application/vnd.github+json' } }
         )
-
         const data = await res.json()
 
         if (Array.isArray(data)) setRepos(data)
-        else {
-          console.error(data)
-          setRepos([])
-        }
-      } catch (e) {
-        console.error(e)
+        else setRepos([])
+      } catch {
         setRepos([])
       }
     }
-
     fetchRepos()
   }, [])
 
@@ -83,8 +95,45 @@ export default function Home() {
 
   if (!mounted) return null
 
+  // ✅ LOADING
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xl"
+        >
+          Chargement...
+        </motion.div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#111827] dark:via-[#030712] dark:to-black text-gray-900 dark:text-gray-100">
+
+      {/* ✅ CURSOR */}
+      <motion.div
+        className="fixed top-0 left-0 w-6 h-6 rounded-full pointer-events-none z-50 bg-blue-500/40 backdrop-blur"
+        animate={{
+          x: mouse.x - 12,
+          y: mouse.y - 12,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+        }}
+      />
+
+      {/* ✅ SPOTLIGHT */}
+      <div
+        className="pointer-events-none fixed inset-0 z-40"
+        style={{
+          background: `radial-gradient(600px at ${mouse.x}px ${mouse.y}px, rgba(59,130,246,0.15), transparent 80%)`,
+        }}
+      />
 
       {/* NAVBAR */}
       <div className="flex justify-between items-center px-6 py-4 border-b bg-white dark:bg-black dark:border-gray-800">
@@ -115,12 +164,11 @@ export default function Home() {
           href="#projects"
           className="px-6 py-3 bg-blue-500 text-white rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
         >
-          Voir mes projets
+          Voir mes projets ↓
         </a>
 
       </section>
 
-      {/* SEPARATOR */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
       {/* SKILLS */}
@@ -128,7 +176,6 @@ export default function Home() {
         <h2 className="text-2xl text-center mb-12">Compétences</h2>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-
           {Object.entries(groupedSkills).map(([category, items]) => (
             <motion.div
               key={category}
@@ -139,17 +186,12 @@ export default function Home() {
               className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur transition hover:shadow-lg"
             >
               <h3 className="font-semibold mb-2">{category}</h3>
-
-              <p className="text-sm">
-                {(items as string[]).join(', ')}
-              </p>
+              <p className="text-sm">{(items as string[]).join(', ')}</p>
             </motion.div>
           ))}
-
         </div>
       </section>
 
-      {/* SEPARATOR */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
       {/* ABOUT */}
@@ -157,7 +199,7 @@ export default function Home() {
         <h2 className="text-2xl font-semibold mb-6">À propos</h2>
 
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
-{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase), illustrant la diversification de mon parcours.
+{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase).
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
@@ -167,7 +209,6 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
         </p>
       </section>
 
-      {/* SEPARATOR */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
       {/* PROJECTS */}
@@ -175,20 +216,18 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
         <h2 className="text-2xl text-center mb-12">Projets</h2>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
           {sortedRepos.map((repo) => (
             <motion.div
               key={repo.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -6, scale: 1.02 }}
+              whileHover={{ y: -8, scale: 1.03 }}
               transition={{ duration: 0.3 }}
               viewport={{ once: true }}
               className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur shadow-sm hover:shadow-xl transition"
+              style={{ willChange: 'transform' }}
             >
-              <h3 className="text-xl font-semibold mb-1">
-                {repo.name}
-              </h3>
+              <h3 className="text-xl font-semibold mb-1">{repo.name}</h3>
 
               <p className="text-xs text-gray-400 mb-2">
                 Créé en {formatDate(repo.created_at)}
@@ -205,10 +244,8 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
               >
                 Voir le code →
               </a>
-
             </motion.div>
           ))}
-
         </div>
       </section>
 
