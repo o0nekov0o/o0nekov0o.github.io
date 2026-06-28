@@ -11,31 +11,30 @@ export default function Home() {
 
   const [skills, setSkills] = useState<any[]>([])
   const [repos, setRepos] = useState<any[]>([])
+  const [filter, setFilter] = useState('all')
 
   const [mouse, setMouse] = useState({ x: 0, y: 0 })
 
   // ✅ INIT THEME
   useEffect(() => {
     const saved = localStorage.getItem('theme')
-    if (saved) setDark(saved === 'dark')
-    else setDark(true)
+    setDark(saved ? saved === 'dark' : true)
     setMounted(true)
   }, [])
 
-  // ✅ APPLY THEME
   useEffect(() => {
     if (!mounted) return
     document.documentElement.classList.toggle('dark', dark)
     localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark, mounted])
 
-  // ✅ LOADING SCREEN
+  // ✅ LOADING
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800)
+    const timer = setTimeout(() => setLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  // ✅ CURSOR TRACK
+  // ✅ CURSOR
   useEffect(() => {
     const move = (e: MouseEvent) => {
       setMouse({ x: e.clientX, y: e.clientY })
@@ -58,13 +57,10 @@ export default function Home() {
     const fetchRepos = async () => {
       try {
         const res = await fetch(
-          'https://api.github.com/users/o0nekov0o/repos',
-          { headers: { Accept: 'application/vnd.github+json' } }
+          'https://api.github.com/users/o0nekov0o/repos'
         )
         const data = await res.json()
-
         if (Array.isArray(data)) setRepos(data)
-        else setRepos([])
       } catch {
         setRepos([])
       }
@@ -79,14 +75,19 @@ export default function Home() {
     return acc
   }, {})
 
-  // ✅ SORT REPOS
+  // ✅ SORT
   const sortedRepos = [...repos].sort(
     (a, b) =>
       new Date(b.created_at).getTime() -
       new Date(a.created_at).getTime()
   )
 
-  // ✅ FORMAT DATE
+  // ✅ FILTER
+  const filteredRepos = sortedRepos.filter((repo) => {
+    if (filter === 'all') return true
+    return repo.language === filter
+  })
+
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -95,17 +96,10 @@ export default function Home() {
 
   if (!mounted) return null
 
-  // ✅ LOADING
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-black text-white">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xl"
-        >
-          Chargement...
-        </motion.div>
+        Chargement...
       </div>
     )
   }
@@ -113,136 +107,129 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#111827] dark:via-[#030712] dark:to-black text-gray-900 dark:text-gray-100">
 
-      {/* ✅ CURSOR */}
+      {/* CURSOR */}
       <motion.div
-        className="fixed top-0 left-0 w-6 h-6 rounded-full pointer-events-none z-50 bg-blue-500/40 backdrop-blur"
-        animate={{
-          x: mouse.x - 12,
-          y: mouse.y - 12,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 300,
-          damping: 20,
-        }}
+        className="fixed w-6 h-6 bg-blue-500/40 rounded-full pointer-events-none z-50"
+        animate={{ x: mouse.x - 12, y: mouse.y - 12 }}
+        transition={{ type: 'spring', stiffness: 300 }}
       />
 
-      {/* ✅ SPOTLIGHT */}
+      {/* SPOTLIGHT */}
       <div
-        className="pointer-events-none fixed inset-0 z-40"
+        className="fixed inset-0 pointer-events-none z-40"
         style={{
-          background: `radial-gradient(600px at ${mouse.x}px ${mouse.y}px, rgba(59,130,246,0.15), transparent 80%)`,
+          background: `radial-gradient(600px at ${mouse.x}px ${mouse.y}px, rgba(59,130,246,0.15), transparent)`
         }}
       />
 
       {/* NAVBAR */}
-      <div className="flex justify-between items-center px-6 py-4 border-b bg-white dark:bg-black dark:border-gray-800">
-        <h1 className="font-bold">Kevin B</h1>
-
-        <button onClick={() => setDark(!dark)}>
-          {dark ? '☀️' : '🌙'}
-        </button>
+      <div className="sticky top-0 z-30 backdrop-blur bg-white/70 dark:bg-black/60 border-b dark:border-gray-800">
+        <div className="flex justify-between px-6 py-4">
+          <h1 className="font-bold">Kevin B</h1>
+          <button onClick={() => setDark(!dark)}>
+            {dark ? '☀️' : '🌙'}
+          </button>
+        </div>
       </div>
 
       {/* HERO */}
-      <section className="text-center py-24 px-6">
-
+      <section className="text-center py-24">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           className="text-5xl font-bold mb-6"
         >
           Développeur Python & Fullstack
         </motion.h1>
 
-        <p className="max-w-xl mx-auto mb-8 text-gray-600 dark:text-gray-300">
+        <p className="text-gray-600 dark:text-gray-300 mb-8">
           Profil hybride combinant développement applicatif et expérience en environnement systèmes et exploitation.
         </p>
 
         <a
           href="#projects"
-          className="px-6 py-3 bg-blue-500 text-white rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:scale-105 transition"
         >
           Voir mes projets ↓
         </a>
-
       </section>
 
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
       {/* SKILLS */}
-      <section className="py-20 px-6">
-        <h2 className="text-2xl text-center mb-12">Compétences</h2>
+      <section className="py-20">
+        <h2 className="text-center text-2xl mb-12">Compétences</h2>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {Object.entries(groupedSkills).map(([category, items]) => (
+          {Object.entries(groupedSkills).map(([cat, items]) => (
             <motion.div
-              key={category}
+              key={cat}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur transition hover:shadow-lg"
+              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur hover:shadow-lg transition"
             >
-              <h3 className="font-semibold mb-2">{category}</h3>
-              <p className="text-sm">{(items as string[]).join(', ')}</p>
+              <h3>{cat}</h3>
+              <p>{(items as string[]).join(', ')}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
-
       {/* ABOUT */}
-      <section className="py-20 px-6 max-w-4xl mx-auto text-center">
-        <h2 className="text-2xl font-semibold mb-6">À propos</h2>
+      <section className="py-20 max-w-4xl mx-auto text-center">
+        <h2 className="text-2xl mb-6">À propos</h2>
 
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
 {`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase).
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
-Le diplôme Développeur Python a été validé à l’issue du projet final.
-
-Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
+Le diplôme Développeur Python a été validé à l’issue du projet final.`}
         </p>
       </section>
 
       <div className="h-px bg-gray-200 dark:bg-gray-800 mx-10" />
 
       {/* PROJECTS */}
-      <section id="projects" className="py-20 px-6 bg-white dark:bg-black">
-        <h2 className="text-2xl text-center mb-12">Projets</h2>
+      <section id="projects" className="py-20">
+        <h2 className="text-center text-2xl mb-8">Projets</h2>
+
+        {/* FILTER */}
+        <div className="flex justify-center gap-3 mb-8">
+          {['all', 'Python', 'TypeScript', 'JavaScript'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 rounded ${
+                filter === f ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {sortedRepos.map((repo) => (
+          {filteredRepos.map((repo) => (
             <motion.div
               key={repo.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -8, scale: 1.03 }}
-              transition={{ duration: 0.3 }}
-              viewport={{ once: true }}
-              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur shadow-sm hover:shadow-xl transition"
-              style={{ willChange: 'transform' }}
+              className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur hover:shadow-xl transition"
             >
-              <h3 className="text-xl font-semibold mb-1">{repo.name}</h3>
+              <h3 className="text-xl font-bold">{repo.name}</h3>
 
-              <p className="text-xs text-gray-400 mb-2">
-                Créé en {formatDate(repo.created_at)}
+              <p className="text-xs text-gray-400">
+                {formatDate(repo.created_at)}
               </p>
 
-              <p className="text-sm text-gray-500 mb-4">
-                {repo.description || 'Aucune description'}
-              </p>
+              <p>{repo.description}</p>
 
               <a
                 href={repo.html_url}
                 target="_blank"
                 className="text-blue-500 hover:underline"
               >
-                Voir le code →
+                Voir →
               </a>
             </motion.div>
           ))}
@@ -250,7 +237,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
       </section>
 
       {/* FOOTER */}
-      <footer className="text-center text-sm text-gray-400 py-6">
+      <footer className="text-center text-sm py-6 text-gray-400">
         © 2026 Kevin B • 91_kevb_1 [at] protonmail.com
       </footer>
 
