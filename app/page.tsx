@@ -161,7 +161,7 @@ if (section) {
         </motion.h1>
 
         <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Profil hybride combinant développement applicatif et expérience en environnement systèmes et exploitation.
+          Profil hybride combinant développement applicatif et expérience en environnement systèmes (exploitation, administration, supervision).
         </p>
 
         <a
@@ -198,11 +198,13 @@ if (section) {
         <h2 className="text-2xl mb-6">À propos</h2>
 
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
-{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase).
+{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase), illustrant la diversification de mon parcours.
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
-Le diplôme Développeur Python a été validé à l’issue du projet final.`}
+Le diplôme Développeur Python a été validé à l’issue du projet final.
+
+Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
         </p>
       </section>
 
