@@ -29,7 +29,6 @@ export default function Home() {
   useEffect(() => {
     if (!mounted) return
     document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark, mounted])
 
   // ✅ LOADING
@@ -50,13 +49,17 @@ export default function Home() {
   // ✅ FETCH SKILLS
   useEffect(() => {
     const fetchSkills = async () => {
-      const { data } = await supabase.from('skills').select('*')
+      const { data } = await supabase
+        .from('skills')
+        .select('*')
+
       if (data) setSkills(data)
     }
+
     fetchSkills()
   }, [])
 
-  // ✅ FETCH GITHUB
+  // ✅ FETCH REPOS
   useEffect(() => {
     const fetchRepos = async () => {
       try {
@@ -69,17 +72,34 @@ export default function Home() {
         setRepos([])
       }
     }
+
     fetchRepos()
   }, [])
 
-  // ✅ GROUP SKILLS
-  const groupedSkills = skills.reduce((acc: any, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = []
-    acc[skill.category].push(skill.name)
-    return acc
-  }, {})
+  // ✅ SORT SKILLS (IMPORTANT)
+  const sortedSkills = [...skills].sort(
+    (a, b) => (a.order || 0) - (b.order || 0)
+  )
 
-  // ✅ SORT REPOS
+  // ✅ GROUP SKILLS (FIX ORDER BUG)
+  const groupedSkills: { category: string; items: string[] }[] = []
+
+  sortedSkills.forEach(skill => {
+    const existing = groupedSkills.find(
+      g => g.category === skill.category
+    )
+
+    if (existing) {
+      existing.items.push(skill.name)
+    } else {
+      groupedSkills.push({
+        category: skill.category,
+        items: [skill.name]
+      })
+    }
+  })
+
+  // ✅ SORT REPOS (date)
   const sortedRepos = [...repos].sort(
     (a, b) =>
       new Date(b.created_at).getTime() -
@@ -87,7 +107,7 @@ export default function Home() {
   )
 
   // ✅ FILTER
-  const filteredRepos = sortedRepos.filter((repo) => {
+  const filteredRepos = sortedRepos.filter(repo => {
     if (filter === 'all') return true
     return repo.language === filter
   })
@@ -95,15 +115,25 @@ export default function Home() {
   // ✅ PAGINATION
   const indexOfLast = currentPage * reposPerPage
   const indexOfFirst = indexOfLast - reposPerPage
+
   const currentRepos = filteredRepos.slice(indexOfFirst, indexOfLast)
+
   const totalPages = Math.ceil(filteredRepos.length / reposPerPage)
 
-  // ✅ SCROLL TOP ON PAGE CHANGE
+  // ✅ SCROLL FIX PAGINATION
   useEffect(() => {
-    const section = document.getElementById('projects')  
-if (section) {
-    section.scrollIntoView({ behavior: 'smooth' })
-  }
+    const section = document.getElementById('projects')
+    if (section) {
+      const y =
+        section.getBoundingClientRect().top +
+        window.scrollY -
+        80
+
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth',
+      })
+    }
   }, [currentPage])
 
   const formatDate = (date: string) =>
@@ -144,6 +174,7 @@ if (section) {
       <div className="sticky top-0 z-30 backdrop-blur bg-white/70 dark:bg-black/60 border-b dark:border-gray-800">
         <div className="flex justify-between px-6 py-4">
           <h1 className="font-bold">Kevin B</h1>
+
           <button onClick={() => setDark(!dark)}>
             {dark ? '☀️' : '🌙'}
           </button>
@@ -179,15 +210,20 @@ if (section) {
         <h2 className="text-center text-2xl mb-12">Compétences</h2>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {Object.entries(groupedSkills).map(([cat, items]) => (
+          {groupedSkills.map(group => (
             <motion.div
-              key={cat}
+              key={group.category}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur hover:shadow-lg transition"
             >
-              <h3>{cat}</h3>
-              <p>{(items as string[]).join(', ')}</p>
+              <h3 className="font-semibold mb-2">
+                {group.category}
+              </h3>
+
+              <p className="text-sm">
+                {group.items.join(', ')}
+              </p>
             </motion.div>
           ))}
         </div>
@@ -200,11 +236,11 @@ if (section) {
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
 {`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase), illustrant la diversification de mon parcours.
 
-Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
+  Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
-Le diplôme Développeur Python a été validé à l’issue du projet final.
+  Le diplôme Développeur Python a été validé à l’issue du projet final.
 
-Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
+  Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
         </p>
       </section>
 
@@ -216,7 +252,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
 
         {/* FILTER */}
         <div className="flex justify-center gap-3 mb-8 flex-wrap">
-          {['all', 'Python', 'TypeScript', 'JavaScript'].map((f) => (
+          {['all', 'Python', 'TypeScript', 'JavaScript'].map(f => (
             <button
               key={f}
               onClick={() => {
@@ -234,15 +270,17 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
           ))}
         </div>
 
-        {/* PROJECT LIST */}
+        {/* LIST */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {currentRepos.map((repo) => (
+          {currentRepos.map(repo => (
             <motion.div
               key={repo.id}
               whileHover={{ y: -8, scale: 1.03 }}
               className="p-6 border dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur hover:shadow-xl transition"
             >
-              <h3 className="text-xl font-bold">{repo.name}</h3>
+              <h3 className="text-xl font-bold">
+                {repo.name}
+              </h3>
 
               <p className="text-xs text-gray-400">
                 {formatDate(repo.created_at)}
@@ -266,20 +304,24 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
         {/* PAGINATION */}
         <div className="flex justify-center mt-10 gap-4 items-center">
           <button
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            onClick={() =>
+              setCurrentPage(p => Math.max(p - 1, 1))
+            }
             disabled={currentPage === 1}
             className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 disabled:opacity-50"
           >
             ←
           </button>
 
-          <span className="text-sm text-gray-500">
+          <span className="text-gray-500">
             {currentPage} / {totalPages}
           </span>
 
           <button
             onClick={() =>
-              setCurrentPage((p) => Math.min(p + 1, totalPages))
+              setCurrentPage(p =>
+                Math.min(p + 1, totalPages)
+              )
             }
             disabled={currentPage === totalPages}
             className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 disabled:opacity-50"
@@ -293,6 +335,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
       <footer className="text-center text-sm py-6 text-gray-400">
         © 2026 Kevin B • 91_kevb_1[at]protonmail.com
       </footer>
+
     </div>
   )
 }
