@@ -86,7 +86,7 @@ export default function Home() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-[#0f172a] dark:via-[#020617] dark:to-black text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-[#111827] dark:via-[#030712] dark:to-[#000000] text-gray-900 dark:text-gray-100">
 
       {/* NAVBAR */}
       <div className="flex justify-between items-center px-6 py-4 border-b bg-white dark:bg-black dark:border-gray-800">
@@ -103,7 +103,7 @@ export default function Home() {
           Développeur Python & Fullstack
         </motion.h1>
 
-        <p className="max-w-xl mx-auto mb-8 text-gray-600 dark:text-gray-400">
+        <p className="max-w-xl mx-auto mb-8 text-gray-600 dark:text-gray-300">
           Profil hybride combinant développement applicatif et expérience en environnement systèmes (exploitation, administration, supervision).
         </p>
 
@@ -126,7 +126,7 @@ export default function Home() {
           {Object.entries(groupedSkills).map(([category, items]) => (
             <div
               key={category}
-              className="p-6 border rounded-xl bg-white dark:bg-gray-900"
+              className="p-6 border rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur"
             >
               <h3 className="font-semibold mb-2">{category}</h3>
               <p className="text-sm">
@@ -144,7 +144,7 @@ export default function Home() {
       <section className="py-20 px-6 max-w-4xl mx-auto text-center">
         <h2 className="text-2xl font-semibold mb-6">À propos</h2>
 
-        <p className="text-gray-600 dark:text-gray-400 whitespace-pre-line">
+        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
 {`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase), illustrant la diversification de mon parcours.
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
@@ -168,7 +168,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
             <motion.div
               key={repo.id}
               whileHover={{ y: -5 }}
-              className="p-6 border rounded-xl bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition"
+              className="p-6 border rounded-xl bg-white dark:bg-gray-900/60 backdrop-blur shadow-sm hover:shadow-md transition"
             >
               <h3 className="text-xl font-semibold mb-1">
                 {repo.name}
