@@ -4,6 +4,62 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 
+// ✅ DND
+import {
+  DndContext,
+  closestCenter
+} from '@dnd-kit/core'
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove
+} from '@dnd-kit/sortable'
+
+import { CSS } from '@dnd-kit/utilities'
+
+// ✅ ITEM DRAG
+function SortableItem({ skill, deleteSkill }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({ id: skill.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex justify-between items-center border dark:border-gray-800 p-4 rounded-lg bg-white dark:bg-gray-900/60 backdrop-blur"
+    >
+      {/* DRAG HANDLE */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab font-semibold"
+      >
+        {skill.category} — {skill.name}
+      </div>
+
+      {/* DELETE */}
+      <button
+        onClick={() => deleteSkill(skill.id)}
+        className="px-2 py-1 bg-red-500 text-white rounded"
+      >
+        ❌
+      </button>
+    </div>
+  )
+}
+
 export default function Admin() {
   const [skills, setSkills] = useState<any[]>([])
   const [category, setCategory] = useState('')
@@ -15,7 +71,7 @@ export default function Admin() {
 
   const router = useRouter()
 
-  // ✅ INIT THEME
+  // ✅ THEME INIT
   useEffect(() => {
     const saved = localStorage.getItem('theme')
     setDark(saved ? saved === 'dark' : true)
@@ -43,23 +99,29 @@ export default function Admin() {
     checkUser()
   }, [])
 
-  // ✅ FETCH (tri par order)
+  // ✅ FETCH
   const fetchSkills = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('skills')
       .select('*')
       .order('order', { ascending: true })
 
+    if (error) {
+      console.error(error)
+      return
+    }
+
     if (data) setSkills(data)
   }
 
-  // ✅ ADD (avec order auto)
+  // ✅ ADD
   const addSkill = async () => {
     if (!category || !name) return
 
-    const nextOrder = skills.length
-      ? Math.max(...skills.map(s => s.order || 0)) + 1
-      : 1
+    const nextOrder =
+      skills.length > 0
+        ? Math.max(...skills.map(s => s.order || 0)) + 1
+        : 1
 
     await supabase.from('skills').insert([
       { category, name, order: nextOrder }
@@ -76,28 +138,28 @@ export default function Admin() {
     fetchSkills()
   }
 
-  // ✅ MOVE (UP / DOWN)
-  const moveSkill = async (index: number, direction: number) => {
-    const newSkills = [...skills]
-    const targetIndex = index + direction
+  // ✅ DRAG END
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event
 
-    if (targetIndex < 0 || targetIndex >= skills.length) return
+    if (!over || active.id === over.id) return
 
-    const current = newSkills[index]
-    const target = newSkills[targetIndex]
+    const oldIndex = skills.findIndex(s => s.id === active.id)
+    const newIndex = skills.findIndex(s => s.id === over.id)
 
-    // swap order
-    const temp = current.order
-    current.order = target.order
-    target.order = temp
+    const newSkills = arrayMove(skills, oldIndex, newIndex)
 
-    setSkills([...newSkills].sort((a, b) => a.order - b.order))
+    setSkills(newSkills)
 
-    // update DB
-    await Promise.all([
-      supabase.from('skills').update({ order: current.order }).eq('id', current.id),
-      supabase.from('skills').update({ order: target.order }).eq('id', target.id)
-    ])
+    // ✅ sync DB
+    await Promise.all(
+      newSkills.map((skill, index) =>
+        supabase
+          .from('skills')
+          .update({ order: index + 1 })
+          .eq('id', skill.id)
+      )
+    )
   }
 
   // ✅ LOGOUT
@@ -155,57 +217,26 @@ export default function Admin() {
 
       </div>
 
-      {/* LIST */}
-      <div className="space-y-3">
-
-        {skills.map((skill, i) => (
-          <div
-            key={skill.id}
-            className="flex justify-between items-center border dark:border-gray-800 p-4 rounded-lg bg-white dark:bg-gray-900/60 backdrop-blur"
-          >
-
-            {/* INFO */}
-            <div>
-              <p className="font-semibold">
-                {skill.category}
-              </p>
-              <p className="text-sm text-gray-500">
-                {skill.name}
-              </p>
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex items-center gap-2">
-
-              {/* MOVE */}
-              <button
-                onClick={() => moveSkill(i, -1)}
-                className="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded"
-              >
-                ↑
-              </button>
-
-              <button
-                onClick={() => moveSkill(i, 1)}
-                className="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded"
-              >
-                ↓
-              </button>
-
-              {/* DELETE */}
-              <button
-                onClick={() => deleteSkill(skill.id)}
-                className="px-2 py-1 bg-red-500 text-white rounded"
-              >
-                ❌
-              </button>
-
-            </div>
-
+      {/* LIST DRAG & DROP */}
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={skills.map(s => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-3">
+            {skills.map(skill => (
+              <SortableItem
+                key={skill.id}
+                skill={skill}
+                deleteSkill={deleteSkill}
+              />
+            ))}
           </div>
-        ))}
-
-      </div>
+        </SortableContext>
+      </DndContext>
 
     </div>
   )
