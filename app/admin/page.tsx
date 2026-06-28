@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 
-// ✅ DND
+// ✅ DND KIT
 import {
   DndContext,
   closestCenter
@@ -71,7 +71,7 @@ export default function Admin() {
 
   const router = useRouter()
 
-  // ✅ THEME INIT
+  // ✅ INIT THEME
   useEffect(() => {
     const saved = localStorage.getItem('theme')
     setDark(saved ? saved === 'dark' : true)
@@ -99,7 +99,7 @@ export default function Admin() {
     checkUser()
   }, [])
 
-  // ✅ FETCH
+  // ✅ FETCH AVEC TRI
   const fetchSkills = async () => {
     const { data, error } = await supabase
       .from('skills')
@@ -114,7 +114,7 @@ export default function Admin() {
     if (data) setSkills(data)
   }
 
-  // ✅ ADD
+  // ✅ ADD SKILL
   const addSkill = async () => {
     if (!category || !name) return
 
@@ -138,7 +138,7 @@ export default function Admin() {
     fetchSkills()
   }
 
-  // ✅ DRAG END
+  // ✅ DRAG & DROP FIX FINAL
   const handleDragEnd = async (event: any) => {
     const { active, over } = event
 
@@ -149,14 +149,21 @@ export default function Admin() {
 
     const newSkills = arrayMove(skills, oldIndex, newIndex)
 
-    setSkills(newSkills)
+    // ✅ recalcul COMPLET de l'ordre
+    const updatedSkills = newSkills.map((skill, index) => ({
+      ...skill,
+      order: index + 1
+    }))
 
-    // ✅ sync DB
+    // ✅ update UI
+    setSkills(updatedSkills)
+
+    // ✅ update DB (critique)
     await Promise.all(
-      newSkills.map((skill, index) =>
+      updatedSkills.map(skill =>
         supabase
           .from('skills')
-          .update({ order: index + 1 })
+          .update({ order: skill.order })
           .eq('id', skill.id)
       )
     )
@@ -217,7 +224,7 @@ export default function Admin() {
 
       </div>
 
-      {/* LIST DRAG & DROP */}
+      {/* LIST DRAG */}
       <DndContext
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
@@ -241,3 +248,4 @@ export default function Admin() {
     </div>
   )
 }
+``
