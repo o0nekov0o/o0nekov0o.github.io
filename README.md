@@ -93,4 +93,5 @@ Script Python d’extraction de données avec génération de fichiers CSV et im
 
 ## 📬 Contact
 
-- GitHub : https://github.com/monlogin
+- 📧 Email : 91_kevb_1@protonmail.com
+- GitHub : https://github.com/o0nekov0o

@@ -222,7 +222,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="text-center text-sm text-gray-400 py-6">
-        © 2026 91_kevb_1[at]protonmail[dot]com
+        © 2026 Kevin B • 91_kevb_1@protonmail.com
       </footer>
 
     </div>
