@@ -32,7 +32,7 @@ Je conçois des applications modernes avec une attention particulière à :
 
 ### 🧠 IDE Notes App (Projet phare)
 Application fullstack de prise de notes inspirée des IDE avec navigation contextuelle avancée, multi‑onglets et recherche temps réel.  
-👉 https://notepadsaas.vercel.app/
+👉 https://o0nekov0ogithubio.vercel.app/
 
 ---
 
