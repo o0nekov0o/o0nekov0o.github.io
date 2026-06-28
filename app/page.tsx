@@ -11,7 +11,11 @@ export default function Home() {
 
   const [skills, setSkills] = useState<any[]>([])
   const [repos, setRepos] = useState<any[]>([])
+
   const [filter, setFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const reposPerPage = 10
 
   const [mouse, setMouse] = useState({ x: 0, y: 0 })
 
@@ -75,7 +79,7 @@ export default function Home() {
     return acc
   }, {})
 
-  // ✅ SORT
+  // ✅ SORT REPOS
   const sortedRepos = [...repos].sort(
     (a, b) =>
       new Date(b.created_at).getTime() -
@@ -87,6 +91,17 @@ export default function Home() {
     if (filter === 'all') return true
     return repo.language === filter
   })
+
+  // ✅ PAGINATION
+  const indexOfLast = currentPage * reposPerPage
+  const indexOfFirst = indexOfLast - reposPerPage
+  const currentRepos = filteredRepos.slice(indexOfFirst, indexOfLast)
+  const totalPages = Math.ceil(filteredRepos.length / reposPerPage)
+
+  // ✅ SCROLL TOP ON PAGE CHANGE
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage])
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString('fr-FR', {
@@ -143,7 +158,7 @@ export default function Home() {
         </motion.h1>
 
         <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Profil hybride combinant développement applicatif et expérience en environnement systèmes (exploitation, administration, supervision).
+          Profil hybride combinant développement applicatif et expérience en environnement systèmes et exploitation.
         </p>
 
         <a
@@ -180,13 +195,11 @@ export default function Home() {
         <h2 className="text-2xl mb-6">À propos</h2>
 
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
-{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase), illustrant la diversification de mon parcours.
+{`Ce portfolio présente une sélection de projets significatifs issus de ma formation développeur Python, complétée par des réalisations personnelles en développement fullstack moderne (Next.js, Supabase).
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
-Le diplôme Développeur Python a été validé à l’issue du projet final.
-
-Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
+Le diplôme Développeur Python a été validé à l’issue du projet final.`}
         </p>
       </section>
 
@@ -197,13 +210,18 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
         <h2 className="text-center text-2xl mb-8">Projets</h2>
 
         {/* FILTER */}
-        <div className="flex justify-center gap-3 mb-8">
+        <div className="flex justify-center gap-3 mb-8 flex-wrap">
           {['all', 'Python', 'TypeScript', 'JavaScript'].map((f) => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => {
+                setFilter(f)
+                setCurrentPage(1)
+              }}
               className={`px-4 py-2 rounded ${
-                filter === f ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800'
+                filter === f
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-800'
               }`}
             >
               {f}
@@ -211,8 +229,9 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
           ))}
         </div>
 
+        {/* PROJECT LIST */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {filteredRepos.map((repo) => (
+          {currentRepos.map((repo) => (
             <motion.div
               key={repo.id}
               whileHover={{ y: -8, scale: 1.03 }}
@@ -224,7 +243,9 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
                 {formatDate(repo.created_at)}
               </p>
 
-              <p>{repo.description}</p>
+              <p className="text-sm text-gray-500 mb-3">
+                {repo.description}
+              </p>
 
               <a
                 href={repo.html_url}
@@ -236,13 +257,37 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
             </motion.div>
           ))}
         </div>
+
+        {/* PAGINATION */}
+        <div className="flex justify-center mt-10 gap-4 items-center">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 disabled:opacity-50"
+          >
+            ←
+          </button>
+
+          <span className="text-sm text-gray-500">
+            {currentPage} / {totalPages}
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((p) => Math.min(p + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 disabled:opacity-50"
+          >
+            →
+          </button>
+        </div>
       </section>
 
       {/* FOOTER */}
       <footer className="text-center text-sm py-6 text-gray-400">
-        © 2026 Kevin B • 91_kevb_1[at]protonmail.com
+        © 2026 Kevin B • 91_kevb_1 [at] protonmail.com
       </footer>
-
     </div>
   )
 }
