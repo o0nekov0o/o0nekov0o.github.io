@@ -73,7 +73,10 @@ export default function Home() {
   }, [])
 
   // ✅ GROUP SKILLS
-  const groupedSkills = skills.reduce((acc: any, skill) => {
+  const sortedSkills = [...skills].sort(
+    (a, b) => (a.order || 0) - (b.order || 0)
+  )
+  const groupedSkills = sortedSkills.reduce((acc: any, skill) => {
     if (!acc[skill.category]) acc[skill.category] = []
     acc[skill.category].push(skill.name)
     return acc
