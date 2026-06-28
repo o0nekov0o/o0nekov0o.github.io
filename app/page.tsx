@@ -100,7 +100,10 @@ export default function Home() {
 
   // ✅ SCROLL TOP ON PAGE CHANGE
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    const section = document.getElementById('projects')  
+if (section) {
+    section.scrollIntoView({ behavior: 'smooth' })
+  }
   }, [currentPage])
 
   const formatDate = (date: string) =>
