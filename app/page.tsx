@@ -184,7 +184,9 @@ export default function Home() {
 
 Les projets les plus courts ou orientés soft skills n’ont pas été inclus afin de mettre en avant des réalisations techniques plus complètes.
 
-Le diplôme Développeur Python a été validé à l’issue du projet final.`}
+Le diplôme Développeur Python a été validé à l’issue du projet final.
+
+Au cours de mon expérience en exploitation, j’ai été amené à intervenir sur différents aspects des environnements systèmes (suivi opérationnel, supervision, configuration), me permettant de développer une vision globale des environnements de production.`}
         </p>
       </section>
 
