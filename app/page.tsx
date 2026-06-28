@@ -240,7 +240,7 @@ Au cours de mon expérience en exploitation, j’ai été amené à intervenir s
 
       {/* FOOTER */}
       <footer className="text-center text-sm py-6 text-gray-400">
-        © 2026 Kevin B • 91_kevb_1 [at] protonmail.com
+        © 2026 Kevin B • 91_kevb_1[at]protonmail.com
       </footer>
 
     </div>
